@@ -13,6 +13,7 @@ interface JobState {
 
 const Job: React.FC<JobState> = ({ jobId, cmdline, status, output }) => {
   const [inputText, setInputText] = React.useState("hey")
+  const [autoEol, setAutoEol] = React.useState(true)
 
   return (
     <li
@@ -32,11 +33,16 @@ const Job: React.FC<JobState> = ({ jobId, cmdline, status, output }) => {
           onChange={ev => setInputText(ev.target.value)}
           onKeyPress={ev => {
             if (ctrlEnterIsPressed(ev) && inputText !== "") {
-              const text = !inputText.endsWith("\n") ? inputText + "\n" : inputText
+              const text = autoEol && !inputText.endsWith("\n") ? inputText + "\n" : inputText
               ipcRenderer.invoke("rt-write", jobId, text)
               setInputText("")
             }
           }} />
+
+        <label>
+          <input type="checkbox" checked={autoEol} onChange={() => setAutoEol(!autoEol)} />
+          自動改行
+        </label>
       </details>
     </li>
   )
