@@ -11,6 +11,37 @@ interface JobState {
   output: string
 }
 
+const Job: React.FC<JobState> = ({ jobId, cmdline, status, output }) => {
+  const [inputText, setInputText] = React.useState("hey")
+
+  return (
+    <li
+      key={jobId}
+      className="g-job"
+      data-status={status.kind === "EXITED" ? (status.exitCode === 0 ? "ok" : "error") : "running"}>
+      <details>
+        <summary>
+          <code>$ {cmdline}</code>
+          <code color="#666">#{jobId}</code>
+        </summary>
+
+        <pre style={{ background: "#eee" }}>{output}</pre>
+
+        <textarea
+          value={inputText}
+          onChange={ev => setInputText(ev.target.value)}
+          onKeyPress={ev => {
+            if (ctrlEnterIsPressed(ev) && inputText !== "") {
+              const text = !inputText.endsWith("\n") ? inputText + "\n" : inputText
+              ipcRenderer.invoke("rt-write", jobId, text)
+              setInputText("")
+            }
+          }} />
+      </details>
+    </li>
+  )
+}
+
 export const Main: React.FC = () => {
   // 作業ディレクトリ
   const [workDir, setWorkDir] = React.useState("...")
@@ -103,17 +134,8 @@ export const Main: React.FC = () => {
   return (
     <main id="app-main">
       <ul id="job-list">
-        {jobs.map(({ jobId, cmdline: command, output, status }) => (
-          <li key={jobId} data-status={status.kind === "EXITED" ? (status.exitCode === 0 ? "ok" : "error") : "running"}>
-            <details>
-              <summary>
-                <code>$ {command}</code>
-                <code color="#666">#{jobId}</code>
-              </summary>
-
-              <pre style={{ background: "#eee" }}>{output}</pre>
-            </details>
-          </li>
+        {jobs.map(job => (
+          <Job key={job.jobId} {...job} />
         ))}
       </ul>
 
@@ -125,9 +147,9 @@ export const Main: React.FC = () => {
         value={cmdline}
         onChange={ev => setCmdline(ev.target.value)}
         onKeyPress={ev => {
-          const onlyCtrl = ev.ctrlKey && !ev.shiftKey && !ev.altKey && !ev.metaKey
-          if (onlyCtrl && ev.key === "Enter") {
+          if (ctrlEnterIsPressed(ev)) {
             execute()
+            setCmdline("")
           }
         }}
         rows={4} />
@@ -137,4 +159,9 @@ export const Main: React.FC = () => {
 
 export const renderMain = () => {
   return (<Main />)
+}
+
+const ctrlEnterIsPressed = (ev: React.KeyboardEvent): boolean => {
+  const onlyCtrl = ev.ctrlKey && !ev.shiftKey && !ev.altKey && !ev.metaKey
+  return onlyCtrl && ev.key === "Enter"
 }

@@ -9,3 +9,7 @@
 [data-status="running"] {
     background: hsl(192, 50%, 95%);
 }
+
+g-job:focus {
+    outline: 2px dotted #eee;
+}
