@@ -34,6 +34,7 @@ const Job: React.FC<JobState> = ({ jobId, cmdline, status, output }) => {
           // 入力欄
           <>
             <textarea
+              autoFocus={status.kind === "RUNNING"}
               value={inputText}
               onChange={ev => setInputText(ev.target.value)}
               onKeyPress={ev => {
@@ -199,6 +200,7 @@ export const Main: React.FC = () => {
       </div>
 
       <textarea
+        autoFocus={true}
         value={cmdline}
         onChange={ev => setCmdline(ev.target.value)}
         onKeyPress={ev => {
