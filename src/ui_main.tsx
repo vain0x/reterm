@@ -22,7 +22,7 @@ const Job: React.FC<JobState> = ({ jobId, cmdline, status, output }) => {
       key={jobId}
       className="g-job"
       data-status={status.kind === "EXITED" ? (status.exitCode === 0 ? "ok" : "error") : "running"}>
-      <details>
+      <details open={true}>
         <summary>
           <code>$ {cmdline}</code>
           <code color="#666">#{jobId}</code>
