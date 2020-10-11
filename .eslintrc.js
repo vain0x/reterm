@@ -29,6 +29,8 @@ module.exports = {
     // 未使用の変数宣言を禁止するルール
     // JSX で使う import React を unused として検出する不具合があるようなので、無効化する。
     "@typescript-eslint/no-unused-vars": 0,
+    // 定数である条件式をエラーにするルール。while (true) に反応するので無効化する。
+    "no-constant-condition": 0,
     // エラーではなく警告にする。
     "prefer-const": "warn",
   },
