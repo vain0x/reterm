@@ -1,7 +1,6 @@
 import { ipcRenderer } from "electron"
 import React from "react"
 import { JobStatus, Exited, ExitedOk, ExitedErr } from "./shared/job_status"
-import { Terminal } from "xterm"
 
 type JobId = string
 
@@ -12,37 +11,7 @@ interface JobState {
   output: string
 }
 
-const XTerm: React.FC<JobState> = ({ output }) => {
-  const elementRef = React.useRef<HTMLDivElement>(null)
-
-  // 要素がマウントされたらターミナルを開く。
-  React.useEffect(() => {
-    const element = elementRef.current
-    if (element == null) {
-      return
-    }
-
-    const term = new Terminal()
-    term.open(element)
-    term.write(output)
-
-    return () => {
-      term.dispose()
-    }
-  }, [output, elementRef.current])
-
-  // const [current, setCurrent] = React.useState("")
-  // React.useEffect(() => {
-  //   term.
-  // }, [value])
-
-  return (
-    <div ref={elementRef} />
-  )
-}
-
-const Job: React.FC<JobState> = job => {
-  const { jobId, cmdline, status } = job
+const Job: React.FC<JobState> = ({ jobId, cmdline, status, output }) => {
   const [inputText, setInputText] = React.useState("hey")
   const [autoEol, setAutoEol] = React.useState(true)
 
@@ -56,6 +25,8 @@ const Job: React.FC<JobState> = job => {
           <code>$ {cmdline}</code>
           <code color="#666">#{jobId}</code>
         </summary>
+
+        <pre style={{ background: "#eee" }}>{output}</pre>
 
         <textarea
           value={inputText}
@@ -72,8 +43,6 @@ const Job: React.FC<JobState> = job => {
           <input type="checkbox" checked={autoEol} onChange={() => setAutoEol(!autoEol)} />
           自動改行
         </label>
-
-        <XTerm {...job} />
       </details>
     </li>
   )
@@ -122,7 +91,6 @@ export const Main: React.FC = () => {
           cmdline,
           output: "",
           status,
-          term: new Terminal(),
         },
       ])
     })
@@ -137,7 +105,6 @@ export const Main: React.FC = () => {
 
         const output = job.output !== "" ? job.output + "\n" + data : data
         return { ...job, output }
-        // return job
       }))
     })
 
