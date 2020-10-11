@@ -3,6 +3,8 @@ import React from "react"
 import { JobStatus, Exited, ExitedOk, ExitedErr } from "./shared/job_status"
 import { decodeEscapeSequence } from "./shared/escape_decode"
 import { exhaust } from "./shared/exhaust"
+import { DirTreeContainer } from "./view/dir_tree_container"
+import { DirTreeHost } from "./view/dir_tree_types"
 
 type JobId = string
 
@@ -11,6 +13,17 @@ interface JobState {
   cmdline: string
   status: JobStatus
   output: string
+}
+
+const DirTreeHost: DirTreeHost = {
+  rootPath: "/home/owner",
+  fs: {
+    readdir: path => ipcRenderer.invoke("node-fs-readdir", path),
+    stat: path => ipcRenderer.invoke("node-fs-stat", path),
+  },
+  path: {
+    basename: path => ipcRenderer.invoke("node-path-basename", path),
+  },
 }
 
 const Job: React.FC<JobState> = ({ jobId, cmdline, status, output }) => {
@@ -194,28 +207,32 @@ export const Main: React.FC = () => {
   }, [trimmedCmdline, jobs])
 
   return (
-    <main id="app-main">
-      <ul id="job-list">
-        {jobs.map(job => (
-          <Job key={job.jobId} {...job} />
-        ))}
-      </ul>
+    <main id="g-app-main" style={{ display: "flex" }}>
+      <div className="g-flex-column" style={{ flex: "1", padding: "0.8rem 1.6rem" }}>
+        <ul id="job-list">
+          {jobs.map(job => (
+            <Job key={job.jobId} {...job} />
+          ))}
+        </ul>
 
-      <div>
-        <code>$ {workDir}</code>
+        <div>
+          <code>$ {workDir}</code>
+        </div>
+
+        <textarea
+          autoFocus={true}
+          value={cmdline}
+          onChange={ev => setCmdline(ev.target.value)}
+          onKeyPress={ev => {
+            if (ctrlEnterIsPressed(ev)) {
+              execute()
+              setCmdline("")
+            }
+          }}
+          rows={4} />
       </div>
 
-      <textarea
-        autoFocus={true}
-        value={cmdline}
-        onChange={ev => setCmdline(ev.target.value)}
-        onKeyPress={ev => {
-          if (ctrlEnterIsPressed(ev)) {
-            execute()
-            setCmdline("")
-          }
-        }}
-        rows={4} />
+      <DirTreeContainer host={DirTreeHost} />
     </main>
   )
 }

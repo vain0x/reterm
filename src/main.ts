@@ -1,8 +1,9 @@
 import { app, BrowserWindow, ipcMain } from "electron"
 import * as fs from "fs"
 import * as path from "path"
-import { JobStatus, Running, Exited, ExitedOk } from "./shared/job_status"
+import { JobStatus, Running, Exited } from "./shared/job_status"
 import * as pty from "node-pty"
+import { exposeNodeApi } from "./ipc_node"
 
 type JobId = string
 
@@ -176,3 +177,5 @@ app.on("window-all-closed", () => {
 
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
+
+exposeNodeApi()

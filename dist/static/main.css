@@ -1,3 +1,57 @@
+html {
+    font-size: 62.5%;
+}
+
+body {
+    font-size: 1.6rem;
+}
+
+html,
+body,
+#app-container,
+#g-app-main {
+    margin: 0;
+    padding: 0;
+
+    height: 100%;
+}
+
+/*
+    Flex primitive
+*/
+
+.g-flex-row {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+}
+
+.g-flex-column {
+    display: flex;
+    flex-flow: column nowrap;
+}
+
+.g-flex-row > * + * {
+    margin-left: 0.8rem;
+}
+
+.g-flex-column > * + * {
+    margin-top: 1.6rem;
+}
+
+.g-flex-row > .flex-stretch {
+    flex-grow: 1;
+}
+
+.g-flex-column > .flex-stretch {
+    flex-grow: 1;
+    flex-shrink: 0;
+}
+
+/*
+    Job
+*/
+
 [data-status="ok"] {
     background: hsl(128, 100%, 95%);
 }
@@ -18,4 +72,50 @@
 .g-job .job-output {
     font-family: "JetBrains Mono Regular", "Source Code Pro", monospace;
     white-space: pre-wrap;
+}
+
+/*
+    DirTree
+*/
+
+/* 標準のスタイルのキャンセル */
+.g-dir-tree h1,
+.g-dir-tree ul,
+.g-dir-tree li {
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+    font-size: inherit;
+}
+
+.g-dir-tree h2 {
+    margin-top: 0;
+    margin-bottom: 0;
+
+    font-size: inherit;
+    font-weight: unset;
+}
+
+.g-dir-tree {
+    overflow: auto;
+
+    width: 25vw;
+    max-height: 100%;
+
+    font-family: monospace;
+    color: #444;
+    background: hsl(0, 0%, 98%);
+}
+
+.g-dir-tree .dir-tree-contents {
+    padding-left: 1.6rem;
+}
+
+.g-dir-tree .dir-tree-row {
+    white-space: pre;
+}
+
+.g-dir-tree .dir-tree-row:hover {
+    background: hsl(250, 90%, 97%);
 }
