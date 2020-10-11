@@ -14,7 +14,7 @@ interface JobState {
 }
 
 const Job: React.FC<JobState> = ({ jobId, cmdline, status, output }) => {
-  const [inputText, setInputText] = React.useState("hey")
+  const [inputText, setInputText] = React.useState("")
   const [autoEol, setAutoEol] = React.useState(true)
 
   return (
@@ -30,21 +30,26 @@ const Job: React.FC<JobState> = ({ jobId, cmdline, status, output }) => {
 
         <Output data={output} />
 
-        <textarea
-          value={inputText}
-          onChange={ev => setInputText(ev.target.value)}
-          onKeyPress={ev => {
-            if (ctrlEnterIsPressed(ev) && inputText !== "") {
-              const text = autoEol && !inputText.endsWith("\n") ? inputText + "\n" : inputText
-              ipcRenderer.invoke("rt-write", jobId, text)
-              setInputText("")
-            }
-          }} />
+        {status.kind === "RUNNING" || inputText !== "" ? (
+          // 入力欄
+          <>
+            <textarea
+              value={inputText}
+              onChange={ev => setInputText(ev.target.value)}
+              onKeyPress={ev => {
+                if (ctrlEnterIsPressed(ev) && inputText !== "") {
+                  const text = autoEol && !inputText.endsWith("\n") ? inputText + "\n" : inputText
+                  ipcRenderer.invoke("rt-write", jobId, text)
+                  setInputText("")
+                }
+              }} />
 
-        <label>
-          <input type="checkbox" checked={autoEol} onChange={() => setAutoEol(!autoEol)} />
-          自動改行
-        </label>
+            <label>
+              <input type="checkbox" checked={autoEol} onChange={() => setAutoEol(!autoEol)} />
+              自動改行
+            </label>
+          </>
+        ) : null}
       </details>
     </li>
   )
