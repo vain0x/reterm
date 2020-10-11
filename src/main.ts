@@ -1,4 +1,5 @@
 import { app, BrowserWindow, ipcMain } from "electron"
+import * as fs from "fs"
 import * as path from "path"
 import { JobStatus, Running, Exited, ExitedOk } from "./shared/job_status"
 import * as pty from "node-pty"
@@ -26,15 +27,39 @@ const doExecute = (cmdline: string, reply: (...args: unknown[]) => void): JobSta
   // 組み込みコマンド
   switch (cmd) {
     case "cd": {
-      const [dir] = args
+      let [dir] = args
+      dir = path.resolve(workDir, dir)
 
-      console.log("[TRACE] cd", dir)
-      workDir = dir
-      return { id: jobId, cmdline, proc: null, status: ExitedOk }
+      fs.stat(dir, (err, stat) => {
+        if (err != null) {
+          reply("rt-job-data", jobId, `ERROR(${err.code}): ${err.message}\n`)
+          reply("rt-job-exit", jobId, 1)
+          return
+        }
+
+        if (!stat.isDirectory()) {
+          reply("rt-job-data", jobId, `ERROR: ディレクトリではありません。\n`)
+          reply("rt-job-exit", jobId, 1)
+          return
+        }
+
+        workDir = dir
+        reply("rt-work-dir-changed", workDir)
+        reply("rt-job-exit", jobId, 0)
+        return
+      })
+
+      return { id: jobId, cmdline, proc: null, status: Running }
     }
     case "pwd": {
       console.log("[TRACE] pwd", workDir)
-      return { id: jobId, cmdline, proc: null, status: ExitedOk }
+
+      setImmediate(() => {
+        reply("rt-job-data", jobId, workDir)
+        reply("rt-job-exit", jobId, 0)
+        return
+      })
+      return { id: jobId, cmdline, proc: null, status: Running }
     }
     default:
       break

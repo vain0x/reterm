@@ -105,10 +105,16 @@ export const Main: React.FC = () => {
   // 起動時に作業ディレクトリを受け取る。
   React.useEffect(() => {
     console.log("[TRACE] get-work-dir BEGIN")
+
     ipcRenderer.invoke("rt-get-work-dir").then(workDir => {
       console.log("[TRACE] get-work-dir OK", workDir)
       setWorkDir(workDir)
     }).catch(err => console.error(err))
+
+    ipcRenderer.on("rt-work-dir-changed", (_ev, workDir) => {
+      console.log("[TRACE] rt-work-dir-changed", workDir)
+      setWorkDir(workDir)
+    })
   }, [])
 
   // ジョブリスト
