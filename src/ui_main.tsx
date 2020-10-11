@@ -1,6 +1,8 @@
 import { ipcRenderer } from "electron"
 import React from "react"
 import { JobStatus, Exited, ExitedOk, ExitedErr } from "./shared/job_status"
+import { decodeEscapeSequence } from "./shared/escape_decode"
+import { exhaust } from "./shared/exhaust"
 
 type JobId = string
 
@@ -26,7 +28,7 @@ const Job: React.FC<JobState> = ({ jobId, cmdline, status, output }) => {
           <code color="#666">#{jobId}</code>
         </summary>
 
-        <pre style={{ background: "#eee" }}>{output}</pre>
+        <Output data={output} />
 
         <textarea
           value={inputText}
@@ -45,6 +47,48 @@ const Job: React.FC<JobState> = ({ jobId, cmdline, status, output }) => {
         </label>
       </details>
     </li>
+  )
+}
+
+const Output: React.FC<{ data: string }> = ({ data }) => {
+  let foreground: string | null = null
+  let background: string | null = null
+
+  return (
+    <div className="job-output" data-foreground="white" data-background="black">
+      {decodeEscapeSequence(data).map((item, i) => {
+        switch (item.kind) {
+          case "verbatim":
+            return (
+              <span
+                key={i}
+                data-foreground={foreground ?? undefined}
+                data-background={background ?? undefined}>
+                {item.text}
+              </span>
+            )
+
+          case "newline":
+            return <br key={i} />
+
+          case "reset":
+            foreground = null
+            background = null
+            return null
+
+          case "foreground":
+            foreground = item.color
+            return null
+
+          case "background":
+            background = item.color
+            return null
+
+          default:
+            throw exhaust(item)
+        }
+      })}
+    </div>
   )
 }
 

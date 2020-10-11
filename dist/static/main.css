@@ -10,6 +10,12 @@
     background: hsl(192, 50%, 95%);
 }
 
-g-job:focus {
+.g-job:focus {
+    display: block;
     outline: 2px dotted #eee;
+}
+
+.g-job .job-output {
+    font-family: "JetBrains Mono Regular", "Source Code Pro", monospace;
+    white-space: pre-wrap;
 }

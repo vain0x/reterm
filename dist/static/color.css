@@ -1,0 +1,139 @@
+/*
+    See: https://en.wikipedia.org/wiki/ANSI_escape_code#Colors
+*/
+
+/*
+    文字色
+*/
+
+[data-foreground="black"] {
+    color: rgb(1, 1, 1);
+}
+
+[data-foreground="red"] {
+    color: rgb(222, 56, 43);
+}
+
+[data-foreground="green"] {
+    color: rgb(57, 181, 74);
+}
+
+[data-foreground="yellow"] {
+    color: rgb(255, 199, 6);
+}
+
+[data-foreground="blue"] {
+    color: rgb(0, 111, 184);
+}
+
+[data-foreground="magenta"] {
+    color: rgb(118, 38, 113);
+}
+
+[data-foreground="cyan"] {
+    color: rgb(44, 181, 233);
+}
+
+[data-foreground="white"] {
+    color: rgb(204, 204, 204);
+}
+
+[data-foreground="bright-black"] {
+    color: rgb(128, 128, 128);
+}
+
+[data-foreground="bright-red"] {
+    color: rgb(255, 0, 0);
+}
+
+[data-foreground="bright-green"] {
+    color: rgb(0, 255, 0);
+}
+
+[data-foreground="bright-yellow"] {
+    color: rgb(255, 255, 0);
+}
+
+[data-foreground="bright-blue"] {
+    color: rgb(0, 0, 255);
+}
+
+[data-foreground="bright-magenta"] {
+    color: rgb(255, 0, 255);
+}
+
+[data-foreground="bright-cyan"] {
+    color: rgb(0, 255, 255);
+}
+
+[data-foreground="bright-white"] {
+    color: white;
+}
+
+/*
+    背景色
+*/
+
+[data-background="black"] {
+    background: rgb(1, 1, 1);
+}
+
+[data-background="red"] {
+    background: rgb(222, 56, 43);
+}
+
+[data-background="green"] {
+    background: rgb(57, 181, 74);
+}
+
+[data-background="yellow"] {
+    background: rgb(255, 199, 6);
+}
+
+[data-background="blue"] {
+    background: rgb(0, 111, 184);
+}
+
+[data-background="magenta"] {
+    background: rgb(118, 38, 113);
+}
+
+[data-background="cyan"] {
+    background: rgb(44, 181, 233);
+}
+
+[data-background="white"] {
+    background: rgb(204, 204, 204);
+}
+
+[data-background="bright-black"] {
+    background: rgb(128, 128, 128);
+}
+
+[data-background="bright-red"] {
+    background: rgb(255, 0, 0);
+}
+
+[data-background="bright-green"] {
+    background: rgb(0, 255, 0);
+}
+
+[data-background="bright-yellow"] {
+    background: rgb(255, 255, 0);
+}
+
+[data-background="bright-blue"] {
+    background: rgb(0, 0, 255);
+}
+
+[data-background="bright-magenta"] {
+    background: rgb(255, 0, 255);
+}
+
+[data-background="bright-cyan"] {
+    background: rgb(0, 255, 255);
+}
+
+[data-background="bright-white"] {
+    background: white;
+}
