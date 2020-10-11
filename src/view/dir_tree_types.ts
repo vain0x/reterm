@@ -9,6 +9,8 @@ export type NodeData =
     // icon, etc.
   } | {
     kind: "DIRECTORY"
+    autoExpand: boolean
+    autoFocus: boolean
     children: NodeId[]
   }) // or link
 

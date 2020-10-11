@@ -232,7 +232,7 @@ export const Main: React.FC = () => {
           rows={4} />
       </div>
 
-      <DirTreeContainer host={DirTreeHost} />
+      <DirTreeContainer host={DirTreeHost} workDir={workDir} />
     </main>
   )
 }

@@ -70,10 +70,34 @@ const Node: React.FC<NodeProps> = props => {
 
 const DirNode: React.FC<DirNodeProps> = props => {
   const { nodeData, tree } = props
+
+  const elementRef = React.useRef<HTMLLIElement | null>(null)
+
+  // 開閉
   const [isExpanded, setIsExpanded] = React.useState(false)
 
+  // 自動で開く。
+  const autoExpandIsDone = React.useRef(false)
+  React.useEffect(() => {
+    if (!autoExpandIsDone.current && nodeData.autoExpand) {
+      autoExpandIsDone.current = true
+      setIsExpanded(true)
+    }
+  }, [nodeData.autoExpand])
+
+  // フォーカスを当てる。
+  const autoFocusIsDone = React.useRef(false)
+  React.useEffect(() => {
+    const element = elementRef.current
+    if (!autoFocusIsDone.current && nodeData.autoFocus && element != null) {
+      autoFocusIsDone.current = true
+      element.scrollIntoView({ behavior: "smooth" })
+      element.focus()
+    }
+  }, [nodeData.autoFocus, elementRef.current])
+
   return (
-    <li className="g-flex-column">
+    <li ref={elementRef} className="g-flex-column">
       <div className="dir-tree-row g-flex-row" onClick={() => {
         setIsExpanded(!isExpanded)
       }} style={{ cursor: "pointer" }}>

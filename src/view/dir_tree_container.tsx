@@ -15,15 +15,22 @@ const addPath = (path: string): NodeId => {
   return nodeId
 }
 
-const doUseNodeData = (nodeId: NodeId, host: DirTreeHost): NodeData | null => {
+const doUseNodeData = (nodeId: NodeId, host: DirTreeHost, workDir: string): NodeData | null => {
   const [nodeData, setNodeData] = React.useState<NodeData | null>(null)
 
-  React.useEffect(() => {
-    const nodePath = nodeId == ROOT_ID ? host.rootPath : pathMap.get(nodeId)
+  const nodePath = React.useMemo(() => {
+    if (nodeId == ROOT_ID) {
+      return host.rootPath
+    }
+
+    const nodePath = pathMap.get(nodeId)
     if (nodePath == null) {
       throw new Error("invalid node id")
     }
+    return nodePath
+  }, [])
 
+  React.useEffect(() => {
     host.fs.stat(nodePath).then(async stats => {
       const nodeName = await host.path.basename(nodePath)
 
@@ -35,6 +42,10 @@ const doUseNodeData = (nodeId: NodeId, host: DirTreeHost): NodeData | null => {
           name: nodeName,
           kind: "DIRECTORY",
           children,
+
+          // 後で判定する。
+          autoExpand: false,
+          autoFocus: false,
         })
         return
       }
@@ -51,11 +62,29 @@ const doUseNodeData = (nodeId: NodeId, host: DirTreeHost): NodeData | null => {
     })
   }, [])
 
+  // autoExpand, autoFocus の更新
+  React.useEffect(() => setNodeData(nodeData => {
+    if (nodeData == null || nodeData.kind !== "DIRECTORY") {
+      return nodeData
+    }
+
+    return {
+      ...nodeData,
+      autoExpand: workDir.includes(nodePath),
+      autoFocus: workDir === nodePath,
+    }
+  }), [nodeData != null, workDir])
+
   return nodeData
 }
 
-export const DirTreeContainer: React.FC<{ host: DirTreeHost }> = ({ host }) => {
-  const useNodeData = React.useMemo(() => (nodeId: number) => doUseNodeData(nodeId, host), [])
+export const DirTreeContainer: React.FC<{ host: DirTreeHost, workDir: string }> = props => {
+  const { host, workDir } = props
+
+  const useNodeData = React.useMemo(
+    () => (nodeId: number) => doUseNodeData(nodeId, host, workDir),
+    [host, workDir],
+  )
 
   return (
     <DirTree rootId={ROOT_ID} useNodeData={useNodeData} />
