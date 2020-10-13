@@ -208,7 +208,7 @@ export const Main: React.FC = () => {
 
   return (
     <main id="g-app-main" style={{ display: "flex" }}>
-      <div className="g-flex-column" style={{ flex: "1", padding: "0.8rem 1.6rem" }}>
+      <div className="g-flex-column" style={{ flex: "1", padding: "0.8rem 1.6rem", overflow: "auto" }}>
         <ul id="job-list">
           {jobs.map(job => (
             <Job key={job.jobId} {...job} />
@@ -229,7 +229,7 @@ export const Main: React.FC = () => {
               setCmdline("")
             }
           }}
-          rows={4} />
+          rows={4} style={{ flexShrink: 0 }} />
       </div>
 
       <DirTreeContainer host={DirTreeHost} workDir={workDir} />
