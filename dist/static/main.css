@@ -116,6 +116,12 @@ body,
     white-space: pre;
 }
 
+/* 作業ディレクトリを強調する。 */
+.g-dir-tree [data-is-work-dir="true"] {
+    color: orange;
+    font-weight: bold;
+}
+
 .g-dir-tree .dir-tree-row:hover {
     background: hsl(250, 90%, 97%);
 }

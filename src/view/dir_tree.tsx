@@ -105,7 +105,7 @@ const DirNode: React.FC<DirNodeProps> = props => {
           {isExpanded ? "ｖ" : "＞"}
         </div>
 
-        <h2>
+        <h2 data-is-work-dir={nodeData.autoFocus ? "true" : undefined}>
           {nodeData.name}
         </h2>
       </div>
