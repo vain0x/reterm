@@ -134,7 +134,7 @@ ipcMain.handle("rt-kill", (_ev, jobId, signal) => {
   return true
 })
 
-ipcMain.handle("rt-write", (_ev, jobId, data) => {
+ipcMain.handle("rt-write", (_ev, jobId, data: string | number[] | Uint8Array) => {
   console.log("[TRACE] rt-write", jobId, data)
 
   const job = jobs.find(j => j.id === jobId)
@@ -143,7 +143,11 @@ ipcMain.handle("rt-write", (_ev, jobId, data) => {
     return null
   }
 
-  job.proc.write(data)
+  console.log("data", Buffer.from(data as string, "utf8").toString("hex"))
+  if (typeof data !== "string") {
+    data = new Uint8Array(data)
+  }
+  job.proc.write(data as unknown as string)
   return true
 })
 

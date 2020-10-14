@@ -1,5 +1,5 @@
 import { ipcRenderer } from "electron"
-import React from "react"
+import React, { KeyboardEventHandler } from "react"
 import { JobStatus, Exited, ExitedOk, ExitedErr } from "./shared/job_status"
 import { decodeEscapeSequence } from "./shared/escape_decode"
 import { exhaust } from "./shared/exhaust"
@@ -31,10 +31,40 @@ const Job: React.FC<JobState> = ({ jobId, cmdline, status, output }) => {
   const [inputText, setInputText] = React.useState("")
   const [autoEol, setAutoEol] = React.useState(true)
 
+  const onKeyDown = (ev: React.KeyboardEvent): void => {
+    const data = ((): string | number[] | null => {
+      if (ev.altKey || ev.ctrlKey || ev.metaKey || ev.shiftKey) {
+        return null
+      }
+
+      // see: [xterm.js/Keyboard.ts at master · xtermjs/xterm.js](https://github.com/xtermjs/xterm.js/blob/master/src/common/input/Keyboard.ts)
+      switch (ev.key) {
+        // case "Enter":
+        //   return "\n"
+
+        case "ArrowUp":
+          return [27, 91, 65] // "\x1b[A"
+
+        case "ArrowDown":
+          return [27, 91, 66] // "\x1b[B"
+
+        default:
+          // TODO
+          return null
+      }
+    })()
+
+    if (data != null) {
+      ipcRenderer.invoke("rt-write", jobId, data)
+      ev.preventDefault()
+    }
+  }
+
   return (
     <li
       key={jobId}
       className="g-job"
+      onKeyDown={onKeyDown}
       data-status={status.kind === "EXITED" ? (status.exitCode === 0 ? "ok" : "error") : "running"}>
       <details open={true}>
         <summary>
@@ -70,12 +100,18 @@ const Job: React.FC<JobState> = ({ jobId, cmdline, status, output }) => {
   )
 }
 
-const Output: React.FC<{ data: string }> = ({ data }) => {
+const Output: React.FC<{ data: string, onKeyDown?: React.KeyboardEventHandler }> = props => {
+  const { data, onKeyDown } = props
+
   let foreground: string | null = null
   let background: string | null = null
 
   return (
-    <div className="job-output" data-foreground="white" data-background="black">
+    <div
+      className="job-output"
+      data-foreground="white"
+      data-background="black"
+      onKeyDown={onKeyDown}>
       {decodeEscapeSequence(data).map((item, i) => {
         switch (item.kind) {
           case "verbatim":
