@@ -18,6 +18,17 @@ let lastJobId = 0
 let workDir = process.cwd()
 const jobs: JobState[] = []
 
+const doSetWorkDir = async (dir: string): Promise<void> => {
+  dir = path.resolve(workDir, dir)
+
+  const stats = await fs.promises.stat(dir)
+  if (!stats.isDirectory()) {
+    throw new Error("ディレクトリではありません。")
+  }
+
+  workDir = dir
+}
+
 const doExecute = (cmdline: string, reply: (...args: unknown[]) => void): JobState => {
   lastJobId++
   const jobId = lastJobId.toString()
@@ -28,27 +39,22 @@ const doExecute = (cmdline: string, reply: (...args: unknown[]) => void): JobSta
   // 組み込みコマンド
   switch (cmd) {
     case "cd": {
-      let [dir] = args
-      dir = path.resolve(workDir, dir)
+      const [dir] = args
 
-      fs.stat(dir, (err, stat) => {
-        if (err != null) {
-          reply("rt-job-data", jobId, `ERROR(${err.code}): ${err.message}\n`)
+      const asyncFn = async () => {
+        try {
+          await doSetWorkDir(dir)
+        } catch (err) {
+          const code = err.code ? `(${err.code})` : ""
+          reply("rt-job-data", jobId, `ERROR${code}: ${err.message}\n`)
           reply("rt-job-exit", jobId, 1)
           return
         }
 
-        if (!stat.isDirectory()) {
-          reply("rt-job-data", jobId, `ERROR: ディレクトリではありません。\n`)
-          reply("rt-job-exit", jobId, 1)
-          return
-        }
-
-        workDir = dir
         reply("rt-work-dir-changed", workDir)
         reply("rt-job-exit", jobId, 0)
-        return
-      })
+      }
+      asyncFn()
 
       return { id: jobId, cmdline, proc: null, status: Running }
     }
@@ -98,6 +104,12 @@ const doExecute = (cmdline: string, reply: (...args: unknown[]) => void): JobSta
 ipcMain.handle("rt-get-work-dir", () => {
   console.log("[TRACE] rt-get-work-dir")
   return workDir
+})
+
+ipcMain.on("rt-set-work-dir", async (ev, dir: string) => {
+  console.log("[TRACE] rt-set-work-dir", dir)
+  await doSetWorkDir(dir)
+  ev.reply("rt-work-dir-changed", workDir)
 })
 
 ipcMain.on("rt-execute", (ev, cmdline) => {

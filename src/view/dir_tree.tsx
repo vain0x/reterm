@@ -5,6 +5,7 @@ import { NodeId, NodeData } from "./dir_tree_types"
 interface TreeProps {
   rootId: NodeId
   useNodeData: (nodeId: NodeId) => NodeData | null
+  setWorkDir: (nodeId: NodeId) => void
 }
 
 type NodeProps = {
@@ -98,9 +99,17 @@ const DirNode: React.FC<DirNodeProps> = props => {
 
   return (
     <li ref={elementRef} className="g-flex-column">
-      <div className="dir-tree-row g-flex-row" onClick={() => {
-        setIsExpanded(!isExpanded)
-      }} style={{ cursor: "pointer" }}>
+      <div
+        className="dir-tree-row g-flex-row"
+        onClick={ev => {
+          if (noModifier(ev)) {
+            setIsExpanded(!isExpanded)
+          }
+          if (modifierIsCtrlOnly(ev)) {
+            tree.setWorkDir(nodeData.id)
+          }
+        }}
+        style={{ cursor: "pointer" }}>
         <div>
           {isExpanded ? "ｖ" : "＞"}
         </div>
@@ -120,3 +129,16 @@ const DirNode: React.FC<DirNodeProps> = props => {
     </li>
   )
 }
+
+interface ModifierKeyState {
+  altKey: boolean
+  ctrlKey: boolean
+  metaKey: boolean
+  shiftKey: boolean
+}
+
+const noModifier = (ev: ModifierKeyState): boolean =>
+  !ev.altKey && !ev.ctrlKey && !ev.metaKey && !ev.shiftKey
+
+const modifierIsCtrlOnly = (ev: ModifierKeyState): boolean =>
+  !ev.altKey && ev.ctrlKey && !ev.metaKey && !ev.shiftKey

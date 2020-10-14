@@ -17,6 +17,7 @@ interface JobState {
 
 const DirTreeHost: DirTreeHost = {
   rootPath: "/home/owner",
+  setWorkDir: path => ipcRenderer.send("rt-set-work-dir", path),
   fs: {
     readdir: path => ipcRenderer.invoke("node-fs-readdir", path),
     stat: path => ipcRenderer.invoke("node-fs-stat", path),

@@ -78,15 +78,29 @@ const doUseNodeData = (nodeId: NodeId, host: DirTreeHost, workDir: string): Node
   return nodeData
 }
 
+const doSetWorkDir = (nodeId: NodeId, host: DirTreeHost): void => {
+  const filepath = pathMap.get(nodeId)
+  if (filepath == null) {
+    return
+  }
+
+  host.setWorkDir(filepath)
+}
+
 export const DirTreeContainer: React.FC<{ host: DirTreeHost, workDir: string }> = props => {
   const { host, workDir } = props
 
   const useNodeData = React.useMemo(
-    () => (nodeId: number) => doUseNodeData(nodeId, host, workDir),
+    () => (nodeId: NodeId) => doUseNodeData(nodeId, host, workDir),
     [host, workDir],
   )
 
+  const setWorkDir = React.useMemo(
+    () => (nodeId: NodeId) => doSetWorkDir(nodeId, host),
+    [host],
+  )
+
   return (
-    <DirTree rootId={ROOT_ID} useNodeData={useNodeData} />
+    <DirTree rootId={ROOT_ID} useNodeData={useNodeData} setWorkDir={setWorkDir} />
   )
 }

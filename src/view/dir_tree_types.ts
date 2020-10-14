@@ -17,12 +17,14 @@ export type NodeData =
 export interface DirTreeHost {
   rootPath: string
 
+  setWorkDir: (path: string) => void
+
   fs: {
+    readdir: (path: string) => Promise<string[]>
     stat: (path: string) => Promise<{
       isDirectory: boolean
       isFile: boolean
     }>
-    readdir: (path: string) => Promise<string[]>
   }
 
   path: {
