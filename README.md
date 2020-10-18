@@ -48,6 +48,7 @@ IDE っぽい UI のターミナルエミュレータ。(Electron + React + Type
 (他に知っていたら教えてください。)
 
 - [railsware/upterm\: A terminal emulator for the 21st century.](https://github.com/railsware/upterm) (archived)
+- [kenjinote/cmdchat\: コマンド プロンプト (チャット風)](https://github.com/kenjinote/cmdchat)
 
 ## 開発用の資料
 
